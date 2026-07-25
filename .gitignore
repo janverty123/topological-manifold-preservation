@@ -1,0 +1,14 @@
+_cmd/*
+data/*
+!data/.gitkeep
+outputs/logs/*
+!outputs/logs/.gitkeep
+outputs/models/*
+!outputs/models/.gitkeep
+outputs/diagrams/*
+!outputs/diagrams/.gitkeep
+outputs/plots/*
+!outputs/plots/.gitkeep
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

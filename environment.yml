@@ -1,0 +1,21 @@
+name: tmp-catastrophic-forgetting
+channels:
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - pip
+  - numpy<2.0.0
+  - scipy
+  - matplotlib
+  - seaborn
+  - pandas
+  - pyyaml
+  - tqdm
+  - psutil
+  - pip:
+      - torch>=2.1.0
+      - torchvision>=0.16.0
+      - giotto-tda>=0.6.0
+      - scikit-learn>=1.3.0

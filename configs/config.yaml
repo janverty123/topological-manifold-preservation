@@ -1,0 +1,55 @@
+# ============================================================
+# Topological Manifold Preservation (TMP) - Experiment Config
+# Maps directly to "Simulation" and "Mathematical Formulation"
+# sections of the research plan.
+# ============================================================
+
+seed: 42
+device: "cuda"          # falls back to "cpu" automatically if no GPU is found
+data_dir: "./data"
+output_dir: "./outputs"
+
+# ---- Split-MNIST task definition (Methodology I. Gathering of Data) ----
+task1_classes: [0, 1, 2, 3, 4]
+task2_classes: [5, 6, 7, 8, 9]
+batch_size: 128
+eval_batch_size: 256
+
+# ---- Model architecture ----
+# The "specific hidden layer" referenced in the Mathematical Formulation
+# is `hidden2` (128-d) — this is the layer that is hooked for activation
+# extraction and topological analysis.
+input_dim: 784
+hidden1_dim: 256
+hidden2_dim: 128         # <-- monitored / topologically regularized layer
+num_classes: 10
+
+# ---- Task 1 pretraining (baseline mastery threshold) ----
+task1_target_accuracy: 0.95
+task1_max_epochs: 30
+task1_lr: 0.001
+
+# ---- Task 2 continual-learning phase ----
+task2_epochs: 10
+task2_lr: 0.001
+
+# ---- Topological Data Analysis (Mathematical Formulation, Section II) ----
+tda:
+  point_cloud_size: 500        # Maxmin-sampled activation point cloud size
+  homology_dims: [0, 1]        # H0 (clusters) and H1 (loops/holes)
+  max_edge_length: null        # null = auto (infinity) for Vietoris-Rips filtration
+  bottleneck_delta: 0.01       # approximation slack for bottleneck distance
+
+# ---- TMP loss (Mathematical Formulation, L_total) ----
+tmp:
+  lambda_: 0.5                # lambda in L_total = CE + lambda * W_inf
+  surrogate_subsample: 256    # points used for the differentiable surrogate term
+  recompute_diagram_every_n_steps: 50   # true W_inf (giotto-tda) monitoring cadence
+
+# ---- Elastic Weight Consolidation baseline ----
+ewc:
+  lambda_: 400.0
+  fisher_sample_size: 500
+
+# ---- Logging / reproducibility ----
+log_every_n_steps: 20
