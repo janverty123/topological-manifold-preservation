@@ -48,7 +48,7 @@ tmp:
 
 # ---- Elastic Weight Consolidation baseline ----
 ewc:
-  lambda_: 400.0
+  lambda_: 20000.0
   fisher_sample_size: 500
 
 # ---- Logging / reproducibility ----
