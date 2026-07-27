@@ -24,12 +24,26 @@ MNIST_MEAN = 0.1307
 MNIST_STD = 0.3081
 
 
+class _FlattenTransform:
+    """
+    Picklable replacement for `transforms.Lambda(lambda x: x.view(-1))`.
+    Windows' multiprocessing uses `spawn` (not `fork`), which requires
+    pickling the Dataset (including its transform pipeline) to hand off
+    to DataLoader worker processes. Plain lambdas cannot be pickled, so
+    a named callable class is used instead — this is required for
+    `num_workers > 0` to work on Windows.
+    """
+
+    def __call__(self, x):
+        return x.view(-1)
+
+
 def _mnist_transform():
     return transforms.Compose(
         [
             transforms.ToTensor(),
             transforms.Normalize((MNIST_MEAN,), (MNIST_STD,)),
-            transforms.Lambda(lambda x: x.view(-1)),  # flatten 28x28 -> 784
+            _FlattenTransform(),  # flatten 28x28 -> 784
         ]
     )
 

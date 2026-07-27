@@ -1,3 +1,16 @@
+# NOTE (Windows/macOS users with an NVIDIA GPU):
+# Plain `pip install -r requirements.txt` pulls the CPU-only torch wheel
+# from PyPI on Windows/macOS. For GPU acceleration, install torch/torchvision
+# separately FIRST from PyTorch's CUDA index, then install the rest:
+#   pip uninstall torch torchvision -y
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cuXXX
+#   pip install -r requirements.txt
+# Pick cuXXX <= the "CUDA Version" shown by `nvidia-smi` (a wheel built for a
+# NEWER CUDA runtime than your driver supports can fail to initialize).
+# e.g. `nvidia-smi` shows "CUDA Version: 12.4" -> use cu124:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+# Common options: cu118, cu121, cu124, cu126, cu128 (RTX 50-series).
+# See README.md Section 1 for details.
 torch>=2.1.0
 torchvision>=0.16.0
 giotto-tda>=0.6.0

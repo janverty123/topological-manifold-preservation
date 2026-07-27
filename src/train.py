@@ -37,6 +37,15 @@ def set_seed(seed):
 
 
 def evaluate_accuracy(model, loader, allowed_classes, device):
+    """
+    Task-incremental evaluation: the model is only allowed to choose
+    among `allowed_classes` at test time (logits for all other classes
+    are masked to -inf). This tests whether the model still ranks the
+    Task-1 digits correctly RELATIVE TO EACH OTHER, but does NOT test
+    whether it has confused Task-1 digits with Task-2 digits -- so it
+    substantially UNDERSTATES catastrophic forgetting. Kept for
+    comparison against `evaluate_accuracy_unmasked` below.
+    """
     model.eval()
     correct, total = 0, 0
     with torch.no_grad():
@@ -44,6 +53,30 @@ def evaluate_accuracy(model, loader, allowed_classes, device):
             x, y = x.to(device), y.to(device)
             logits = model(x)
             logits = apply_class_mask(logits, allowed_classes, device)
+            preds = logits.argmax(dim=1)
+            correct += (preds == y).sum().item()
+            total += y.shape[0]
+    return correct / max(total, 1)
+
+
+def evaluate_accuracy_unmasked(model, loader, device):
+    """
+    Class-incremental evaluation: the model must choose the correct
+    digit from ALL 10 classes, with no knowledge of which task the
+    sample came from. This is the evaluation protocol that actually
+    matches the research plan's Rationale ("the network ... ends up
+    overwriting the important things it learned before") -- a model
+    that has forgotten Task 1 will here start predicting Task-2 digits
+    for Task-1 images, which `evaluate_accuracy`'s masking cannot detect.
+    Use THIS metric as the primary Retention Accuracy figure for
+    reporting catastrophic forgetting.
+    """
+    model.eval()
+    correct, total = 0, 0
+    with torch.no_grad():
+        for x, y in loader:
+            x, y = x.to(device), y.to(device)
+            logits = model(x)
             preds = logits.argmax(dim=1)
             correct += (preds == y).sum().item()
             total += y.shape[0]
@@ -81,6 +114,43 @@ def pretrain_task1(cfg, model, loaders, device, logger):
             break
 
     return model
+
+
+def build_fixed_task1_reference(cfg, model, loaders, device):
+    """
+    Selects a FIXED subset of `tmp.surrogate_subsample` Task-1 images
+    (the SAME images used at every training step) and captures their
+    hidden2 activations under the just-mastered Task-1 model.
+
+    WHY THIS MATTERS: the differentiable surrogate loss needs to compare
+    "how does the current network represent THESE SPECIFIC images" vs.
+    "how did the baseline network represent THESE SAME images". Earlier
+    versions of this code instead compared pairwise-distance geometry
+    between two DIFFERENT random samples of Task-1 images each step
+    (the live mini-batch vs. a randomly-resampled slice of the baseline
+    cloud) -- but two different random samples from the same digit
+    distribution naturally have somewhat different pairwise-distance
+    geometry from sampling noise alone, even with zero real drift. That
+    noise dominated the signal: empirically, increasing lambda 20x
+    barely changed the true measured W_inf but substantially hurt
+    retention accuracy, indicating the gradient was fighting sampling
+    noise rather than genuine representational drift. Using a FIXED,
+    paired image set removes that confound entirely.
+    """
+    n_samples = cfg["tmp"]["surrogate_subsample"]
+    subset = loaders["task1_train"].dataset
+    rng = np.random.default_rng(cfg["seed"])
+    idx = rng.choice(len(subset), size=min(n_samples, len(subset)), replace=False)
+    images = torch.stack([subset[i][0] for i in idx]).to(device)
+
+    was_training = model.training
+    model.eval()
+    with torch.no_grad():
+        _ = model(images)
+        baseline_activations = model.get_last_hidden_activation().clone()
+    model.train(was_training)
+
+    return images, baseline_activations
 
 
 def build_baseline_artifacts(cfg, model, loaders, device):
@@ -121,11 +191,23 @@ def train_task2(cfg, model, loaders, device, logger, method: str,
     if method == "ewc":
         ewc_reg = EWC(model, loaders["task1_train"], device, allowed_task1,
                       sample_size=cfg["ewc"]["fisher_sample_size"])
+        mean_fisher = sum(f.sum().item() for f in ewc_reg.fisher.values()) / \
+                      sum(f.numel() for f in ewc_reg.fisher.values())
+        print(f"[EWC config] lambda_={cfg['ewc']['lambda_']} "
+              f"fisher_sample_size={cfg['ewc']['fisher_sample_size']} "
+              f"mean_fisher_value={mean_fisher:.3e}")
 
-    baseline_ref_tensor = None
+    fixed_task1_images = None
+    fixed_baseline_activations = None
     lambda_current = cfg["tmp"]["lambda_"]
     if method == "tmp":
-        baseline_ref_tensor = torch.tensor(base_point_cloud, dtype=torch.float32, device=device)
+        fixed_task1_images, fixed_baseline_activations = build_fixed_task1_reference(
+            cfg, model, loaders, device
+        )
+        print(f"[TMP config] lambda_={cfg['tmp']['lambda_']} "
+              f"surrogate_subsample={fixed_task1_images.shape[0]} "
+              f"point_cloud_size={cfg['tda']['point_cloud_size']} "
+              f"base_point_cloud_shape={base_point_cloud.shape}")
 
     history = []
     global_step = 0
@@ -153,10 +235,18 @@ def train_task2(cfg, model, loaders, device, logger, method: str,
                 ce_val, extra_val = ce_loss.detach().item(), penalty.detach().item()
 
             else:  # tmp
-                hidden_act = model.get_last_hidden_activation()
+                # Re-forward the FIXED Task-1 reference set (same images
+                # every step) through the CURRENT network state to
+                # measure genuine, paired representation drift (see
+                # build_fixed_task1_reference docstring). This is a
+                # second, independent forward pass; `logits` (from the
+                # Task-2 batch `x`) is unaffected.
+                _ = model(fixed_task1_images)
+                hidden_act_task1_current = model.get_last_hidden_activation()
+
                 loss, ce_val, extra_val = tmp_total_loss(
                     logits, y, allowed_task2, device,
-                    hidden_act, baseline_ref_tensor,
+                    hidden_act_task1_current, fixed_baseline_activations,
                     lambda_current,
                 )
 
@@ -181,7 +271,16 @@ def train_task2(cfg, model, loaders, device, logger, method: str,
         mem_mb = psutil.Process(os.getpid()).memory_info().rss / (1024 ** 2)
 
         # ---- Four primary metrics (Simulation section) ----
-        retention_acc = evaluate_accuracy(model, loaders["task1_test"], allowed_task1, device)
+        # `retention_accuracy` is now the CLASS-INCREMENTAL (unmasked)
+        # figure -- this is what actually demonstrates catastrophic
+        # forgetting as described in the Rationale ("the network ...
+        # ends up overwriting the important things it learned before").
+        # `retention_accuracy_task_incremental` is kept alongside it for
+        # reference/ablation, but should NOT be reported as the primary
+        # forgetting metric since it structurally cannot detect
+        # cross-task confusion (see evaluate_accuracy's docstring).
+        retention_acc = evaluate_accuracy_unmasked(model, loaders["task1_test"], device)
+        retention_acc_task_incremental = evaluate_accuracy(model, loaders["task1_test"], allowed_task1, device)
         learning_acc = evaluate_accuracy(model, loaders["task2_test"], allowed_task2, device)
 
         drift_w_inf = None
@@ -198,13 +297,21 @@ def train_task2(cfg, model, loaders, device, logger, method: str,
             drift_w_inf = bottleneck_distance(diagram_base, diagram_current,
                                                delta=cfg["tda"]["bottleneck_delta"])
             # Adaptive rescaling of lambda for the NEXT epoch using the
-            # true measured drift (see losses.py docstring).
-            lambda_current = cfg["tmp"]["lambda_"] * (1.0 + drift_w_inf)
+            # true measured drift (see losses.py docstring). Capped to
+            # [1x, 3x] the base lambda: uncapped rescaling can create a
+            # runaway feedback loop if a too-large penalty is itself
+            # part of what's driving drift up (larger drift -> larger
+            # lambda -> more drift next epoch -> even larger lambda...).
+            # The cap keeps the adaptive term a mild nudge rather than a
+            # potentially destabilizing multiplier.
+            rescale_factor = min(1.0 + drift_w_inf, 3.0)
+            lambda_current = cfg["tmp"]["lambda_"] * rescale_factor
 
         record = {
             "phase": f"task2_{method}",
             "epoch": epoch,
             "retention_accuracy": retention_acc,
+            "retention_accuracy_task_incremental": retention_acc_task_incremental,
             "learning_accuracy": learning_acc,
             "avg_ce_loss": running_ce / max(n_batches, 1),
             "avg_extra_term": running_extra / max(n_batches, 1),
@@ -214,7 +321,8 @@ def train_task2(cfg, model, loaders, device, logger, method: str,
         }
         history.append(record)
         logger.log(record)
-        print(f"[Task2 {method}] epoch={epoch} retention_acc={retention_acc:.4f} "
+        print(f"[Task2 {method}] epoch={epoch} retention_acc(class-inc)={retention_acc:.4f} "
+              f"retention_acc(task-inc)={retention_acc_task_incremental:.4f} "
               f"learning_acc={learning_acc:.4f} drift={drift_w_inf} time={epoch_time:.2f}s")
 
     return model, history

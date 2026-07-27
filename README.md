@@ -73,6 +73,30 @@ python -c "import torch, gtda; print('OK')"
 ```bash
 python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
 ```
+
+**If this prints `False` and you have an NVIDIA GPU:** `pip install torch` from
+plain PyPI installs the **CPU-only** build on Windows and macOS by default —
+the CUDA-enabled builds live on PyTorch's own package index, not PyPI. Fix it
+with:
+
+```bash
+# 1. Remove the CPU-only build
+pip uninstall torch torchvision -y
+
+# 2. Check your driver's max supported CUDA version
+nvidia-smi   # look for "CUDA Version: XX.X" in the top-right
+
+# 3. Install the CUDA build matching (or older than) that version -- a
+#    wheel built for a NEWER CUDA runtime than your driver supports can
+#    fail to initialize, so don't just grab the newest one.
+#    e.g. "CUDA Version: 12.4" -> use cu124:
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+#    Other common options: cu118, cu121, cu126, cu128 (RTX 50-series)
+
+# 4. Verify
+python -c "import torch; print('CUDA available:', torch.cuda.is_available())"
+```
+
 If `False`, everything still runs on CPU — the MLP architecture used
 here (784→256→128→10) is small enough that CPU training on Split-MNIST
 completes in a few minutes.

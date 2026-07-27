@@ -1,4 +1,4 @@
-_cmd/*
+.venv/
 data/*
 !data/.gitkeep
 outputs/logs/*

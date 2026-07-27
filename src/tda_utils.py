@@ -139,11 +139,42 @@ def _stack_diagrams(diagram_a, diagram_b):
     return np.stack([padded_a, padded_b], axis=0)
 
 
-def build_activation_point_cloud(model, dataloader, device, n_points, seed=0):
+def normalize_point_cloud(point_cloud: np.ndarray) -> np.ndarray:
+    """
+    Centers the point cloud at its centroid and rescales it so its own
+    mean pairwise distance equals 1.
+
+    WHY THIS MATTERS: ReLU networks' raw activation magnitudes tend to
+    grow over the course of training regardless of catastrophic
+    forgetting (a well-known, unrelated effect of continued gradient
+    descent). Without this normalization, W_inf(D_base, D_current)
+    conflates two very different things: (1) genuine structural/
+    topological drift in how Task-1 digits are represented, and (2) the
+    network's activations simply getting larger in magnitude as
+    training on Task 2 continues. Only (1) is "catastrophic forgetting"
+    in the sense the research plan describes; (2) is scale noise that
+    would make W_inf climb every epoch even for a perfectly-behaved
+    model. Normalizing removes confound (2), so W_inf measures shape
+    (topology), consistent with what `losses.topological_surrogate_loss`
+    already does for the differentiable training-time term.
+    """
+    centroid = point_cloud.mean(axis=0, keepdims=True)
+    centered = point_cloud - centroid
+    dists = pairwise_distances(centered)
+    off_diagonal = dists[dists > 0]
+    mean_dist = off_diagonal.mean() if off_diagonal.size > 0 else 1.0
+    return centered / (mean_dist + 1e-8)
+
+
+def build_activation_point_cloud(model, dataloader, device, n_points, seed=0, normalize=True):
     """
     End-to-end helper: extracts hidden-layer activations from `model`
-    over `dataloader`, then Maxmin-downsamples to `n_points`.
-    Returns a numpy array of shape (n_points, hidden_dim).
+    over `dataloader`, Maxmin-downsamples to `n_points`, and (by
+    default) normalizes scale so persistence diagrams built from the
+    result measure shape/structure rather than raw magnitude (see
+    `normalize_point_cloud` docstring). Returns a numpy array of shape
+    (n_points, hidden_dim).
     """
     activations = model.extract_activations(dataloader, device).numpy()
-    return maxmin_sample(activations, n_points, seed=seed)
+    sampled = maxmin_sample(activations, n_points, seed=seed)
+    return normalize_point_cloud(sampled) if normalize else sampled

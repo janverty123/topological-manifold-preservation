@@ -64,20 +64,31 @@ def topological_surrogate_loss(current_batch_activations: torch.Tensor,
     """
     Differentiable proxy for structural (topological) drift.
 
-    Compares the pairwise-distance matrix of the current mini-batch's
-    hidden-layer activations against a frozen reference sub-sample
-    drawn from the Task-1 baseline activation cloud (D_base's source
-    points), penalizing the mean absolute change in pairwise geometry.
+    Compares the pairwise-distance matrix of `current_batch_activations`
+    against the pairwise-distance matrix of `baseline_reference_activations`,
+    penalizing the (normalized) mean absolute change in pairwise geometry.
     This is fully differentiable w.r.t. the network weights that
     produced `current_batch_activations`.
 
+    IMPORTANT -- for this to measure genuine drift rather than sampling
+    noise, both arguments must correspond to THE SAME underlying images,
+    just captured at two different points in training (e.g. the frozen
+    baseline activations vs. a live re-forward of that same fixed image
+    set through the current network). This is exactly what
+    `train.build_fixed_task1_reference` + the TMP branch in
+    `train.train_task2` set up: a FIXED subset of Task-1 images is
+    forwarded through the current model every step and compared against
+    that same subset's baseline activations. Comparing DIFFERENT random
+    samples of Task-1 images here (as an earlier version of this code
+    did) confounds sampling noise with real drift and produces an
+    unreliable gradient signal.
+
     Args:
-        current_batch_activations: (B, H) tensor, requires_grad=True,
-            the live hidden2 output for the current mini-batch.
-        baseline_reference_activations: (B, H) tensor (no grad needed),
-            a fixed subsample of the Task-1 baseline activation cloud,
-            resampled to the same batch size B via random selection
-            (with replacement if necessary) each call.
+        current_batch_activations: (N, H) tensor, requires_grad=True,
+            the live hidden2 output for a FIXED reference image set.
+        baseline_reference_activations: (N, H) tensor (no grad needed),
+            that SAME fixed image set's activations under the baseline
+            (just-mastered-Task-1) model.
 
     Returns:
         scalar torch.Tensor loss.
@@ -85,13 +96,34 @@ def topological_surrogate_loss(current_batch_activations: torch.Tensor,
     b = current_batch_activations.shape[0]
     ref = baseline_reference_activations
     if ref.shape[0] != b:
+        # Defensive fallback only -- the intended call pattern (see
+        # docstring above) always passes matched, equal-sized tensors,
+        # so this branch should not trigger in normal use.
         idx = torch.randint(0, ref.shape[0], (b,), device=ref.device)
         ref = ref[idx]
 
     current_dists = torch.cdist(current_batch_activations, current_batch_activations, p=2)
     baseline_dists = torch.cdist(ref, ref, p=2)
 
-    return F.l1_loss(current_dists, baseline_dists)
+    # Normalize each pairwise-distance matrix by its own mean before
+    # comparing. Raw activation-space distances are unbounded and scale
+    # with the network's current weight magnitudes -- without this
+    # normalization, the surrogate's raw value (and gradient) can be
+    # orders of magnitude larger than the cross-entropy loss, letting it
+    # dominate/destabilize training regardless of how small `lambda_` is
+    # set. Normalizing both sides by their OWN (non-detached) mean makes
+    # this a genuinely scale-invariant, shape-preservation penalty:
+    # uniformly shrinking/growing all activations doesn't reduce the
+    # loss (both matrices rescale together), so the only way to lower it
+    # is to actually preserve relative (topological) structure -- which
+    # is the intended behavior. Using a detached mean instead would
+    # leave a collapse loophole where shrinking activations trivially
+    # (and spuriously) lowers the loss.
+    eps = 1e-8
+    current_dists_norm = current_dists / (current_dists.mean() + eps)
+    baseline_dists_norm = baseline_dists / (baseline_dists.mean() + eps)
+
+    return F.l1_loss(current_dists_norm, baseline_dists_norm)
 
 
 def tmp_total_loss(logits, targets, allowed_classes, device,
