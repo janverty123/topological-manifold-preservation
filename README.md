@@ -18,7 +18,7 @@ directly answer Research Questions 1–3 and test Hypotheses H0/H1.
 | Requirement | Minimum | Recommended | Maps to |
 |---|---|---|---|
 | OS | Ubuntu 20.04+ / macOS 12+ / Windows 10+ (WSL2) | Ubuntu 22.04 | Simulation environment |
-| Python | 3.10 | 3.10 | Methodology I |
+| Python | 3.9+ | 3.12 | Methodology I |
 | RAM | 8 GB | 16 GB | Computational Overhead metric |
 | GPU | Optional (CPU works, MLP is small) | NVIDIA GPU + CUDA 11.8/12.1 | Faster Task-2 training |
 | Disk | 2 GB free (MNIST + logs + plots) | 5 GB | Data Collection |
@@ -46,10 +46,10 @@ Core library versions (pinned in `requirements.txt` / `environment.yml`):
 
 ```bash
 # 1. Clone / unzip the project, then move into it
-cd topological-manifold-preservation
+cd tmp
 
 # 2. Create an isolated virtual environment
-python3.10 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\activate
 
 # 3. Upgrade pip and install dependencies
@@ -64,7 +64,7 @@ python -c "import torch, gtda, sklearn, matplotlib; print('OK:', torch.__version
 
 ```bash
 conda env create -f environment.yml
-conda activate tmp-catastrophic-forgetting
+conda activate tmp
 python -c "import torch, gtda; print('OK')"
 ```
 
@@ -91,7 +91,7 @@ completes in a few minutes.
 ## 2. Project Architecture & File Directory Structure
 
 ```
-topological-manifold-preservation/
+tmp/
 ├── README.md                  # This guide
 ├── requirements.txt           # pip dependencies
 ├── environment.yml            # conda dependencies
