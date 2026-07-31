@@ -42,13 +42,13 @@ tda:
 
 # ---- TMP loss (Mathematical Formulation, L_total) ----
 tmp:
-  lambda_: 5.0                # lambda in L_total = CE + lambda * W_inf
+  lambda_: 0.5                # lambda in L_total = CE + lambda * W_inf
   surrogate_subsample: 256    # points used for the differentiable surrogate term
   recompute_diagram_every_n_steps: 50   # true W_inf (giotto-tda) monitoring cadence
 
 # ---- Elastic Weight Consolidation baseline ----
 ewc:
-  lambda_: 20000.0
+  lambda_: 400.0
   fisher_sample_size: 500
 
 # ---- Logging / reproducibility ----

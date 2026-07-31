@@ -375,13 +375,17 @@ python compare_results.py --config configs/config.yaml
 
 ## 7. Extending This Implementation
 
+- **More tasks within Split-MNIST (5-task):** already implemented — see
+  `README_MULTITASK.md` for a generalized N-task pipeline
+  (`run_multitask.py`, `src/train_general.py`, `src/datasets_extended.py`)
+  that splits the same MNIST digits into 5 sequential tasks
+  (`[0,1] → [2,3] → [4,5] → [6,7] → [8,9]`) instead of 2, to test
+  whether TMP's protection holds up over a longer sequence, without
+  touching the original validated 2-task code.
+
 - **Different architecture:** swap `MLPClassifier` in `src/models.py`
   for a CNN; keep the `_capture_hidden2` hook pattern on whichever
   layer you want to topologically monitor.
-- **More tasks (Split-MNIST → 5-task or Split-CIFAR):** generalize
-  `src/data.py`'s two-task split into an N-task list and loop
-  `train_task2`-style logic per task, retaining `D_base` from Task 1
-  (or chaining `D_base ← D_{t-1}` for incremental drift).
 - **Exact (non-adaptive) λ:** set `tmp.lambda_` fixed and remove the
   rescaling line in `src/train.py` if your study design calls for a
   constant-λ ablation.

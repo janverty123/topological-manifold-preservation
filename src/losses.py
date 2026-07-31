@@ -111,17 +111,36 @@ def topological_surrogate_loss(current_batch_activations: torch.Tensor,
     # normalization, the surrogate's raw value (and gradient) can be
     # orders of magnitude larger than the cross-entropy loss, letting it
     # dominate/destabilize training regardless of how small `lambda_` is
-    # set. Normalizing both sides by their OWN (non-detached) mean makes
-    # this a genuinely scale-invariant, shape-preservation penalty:
-    # uniformly shrinking/growing all activations doesn't reduce the
-    # loss (both matrices rescale together), so the only way to lower it
-    # is to actually preserve relative (topological) structure -- which
-    # is the intended behavior. Using a detached mean instead would
-    # leave a collapse loophole where shrinking activations trivially
-    # (and spuriously) lowers the loss.
-    eps = 1e-8
-    current_dists_norm = current_dists / (current_dists.mean() + eps)
-    baseline_dists_norm = baseline_dists / (baseline_dists.mean() + eps)
+    # set.
+    #
+    # IMPORTANT: the denominator (the mean) is DETACHED here. An earlier
+    # version of this code normalized by a live, non-detached mean for
+    # full scale-invariance -- but that has a serious numerical failure
+    # mode: the gradient of x / mean(x) w.r.t. x contains a 1/mean(x)
+    # term that BLOWS UP as the mean shrinks toward zero (which can
+    # happen if activations partially collapse under training pressure).
+    # A tiny, well-behaved FORWARD loss value says nothing about the
+    # BACKWARD gradient magnitude -- this is exactly the kind of bug
+    # that stays invisible unless you specifically log gradient norms
+    # (see train_general.py's grad-norm logging, added after this bug
+    # was diagnosed via a multi-task lambda sweep where every nonzero
+    # lambda collapsed learning to near-zero regardless of its size,
+    # while the reported loss value looked completely normal).
+    #
+    # Detaching the denominator is the standard "stop-gradient on
+    # statistics" technique (used e.g. in BYOL/SimSiam) -- it keeps
+    # gradients numerically bounded (1/c for a CONSTANT c each step,
+    # not 1/x that can blow up), at the cost of reopening a much MILDER
+    # collapse incentive than the original un-normalized loss had: since
+    # the denominator is recomputed fresh from the live mean every
+    # step, the network can't permanently exploit shrinking scale to
+    # cheat the loss -- each subsequent step re-normalizes against
+    # whatever the new scale actually is.
+    eps = 1e-4
+    current_denom = current_dists.mean().detach().clamp(min=eps)
+    baseline_denom = baseline_dists.mean().clamp(min=eps)
+    current_dists_norm = current_dists / current_denom
+    baseline_dists_norm = baseline_dists / baseline_denom
 
     return F.l1_loss(current_dists_norm, baseline_dists_norm)
 
