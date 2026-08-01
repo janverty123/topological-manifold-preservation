@@ -1,55 +1,89 @@
 # PROJECT STATUS
 
-## Project Goal
-
-Develop a scientifically grounded continual learning framework based on **Topological Manifold Preservation (TMP)** that preserves learned knowledge while maintaining meaningful topological structure.
-
----
-
-## Current Research Phase
-
-Algorithm diagnosis and refinement.
-
-The implementation exists. The current objective is to understand why TMP preserves previous knowledge while degrading acquisition of new tasks.
+> **Purpose**
+>
+> This document describes the current long-term state of the project.
+>
+> It should only be updated when the project's direction, architecture, or milestones change.
+>
+> Temporary implementation details belong in `CURRENT_CONTEXT.md`.
 
 ---
 
-## Confirmed Findings
+# Project Summary
 
-The following implementation issues have already been addressed:
+Project Name:
 
-* Gradient normalization instability.
-* Surrogate weight concentration.
-* Cumulative protective dosage asymmetry.
+Topological Manifold Preservation (TMP)
 
-These issues should not be reintroduced without strong evidence.
+Research Domain:
 
----
+Continual Learning
 
-## Current Bottleneck
+Primary Baseline:
 
-Learning collapse occurs when TMP is enabled.
+* Elastic Weight Consolidation (EWC)
 
-The project is currently investigating whether this behavior originates from:
+Secondary Baseline:
 
-* optimization,
-* topology-based supervision,
-* conflicting objectives,
-* representation dynamics,
-* or another underlying mechanism.
+* Finetuning
+
+Repository Status:
+
+Active Development
 
 ---
 
-## Immediate Objectives
+# Project Objective
 
-Current priorities:
+Develop and evaluate a continual learning framework based on Topological Manifold Preservation (TMP).
 
-1. Identify the mechanism responsible for learning collapse.
-2. Validate hypotheses through controlled experiments.
-3. Preserve scientific correctness before modifying the algorithm.
+The primary evaluation objective is to determine whether TMP can:
+
+* outperform EWC,
+* achieve performance comparable to EWC,
+* or achieve performance sufficiently close to EWC while providing meaningful theoretical advantages.
 
 ---
 
-## Last Updated
+# Current Phase
 
-Update this document only when the overall research direction changes.
+Implementation Optimization
+
+The theoretical direction has already been established.
+
+Current work focuses on improving the implementation rather than redefining the research.
+
+---
+
+# Major Milestones
+
+* ✓ Research proposal completed
+* ✓ Initial implementation completed
+* ✓ Repository established
+* ✓ Claude Project integrated
+* ✓ Documentation system established
+* ☐ Performance optimization
+* ☐ Experimental comparison with EWC
+* ☐ Final evaluation
+* ☐ Paper completion
+
+---
+
+# Repository Philosophy
+
+This repository prioritizes:
+
+1. Correctness
+2. Reproducibility
+3. Maintainability
+4. Efficient AI-assisted development
+
+---
+
+# Related Documents
+
+* README.md
+* CURRENT_CONTEXT.md
+* DESIGN_PRINCIPLES.md
+* OPEN_QUESTIONS.md

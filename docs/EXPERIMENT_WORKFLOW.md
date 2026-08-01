@@ -1,122 +1,133 @@
 # EXPERIMENT WORKFLOW
 
-This document defines the standard workflow for conducting research in the Topological Manifold Preservation (TMP) project.
-
-Its purpose is to ensure that every experiment is planned, executed, documented, and interpreted consistently.
-
----
-
-# Research Lifecycle
-
-Every research iteration should follow this sequence:
-
-1. Identify an open research question.
-2. Formulate a hypothesis.
-3. Design the experiment.
-4. Execute the experiment.
-5. Analyze the evidence.
-6. Record the findings.
-7. Decide the next research direction.
-
-No experiment should skip the documentation stage.
+> **Purpose**
+>
+> Define the standard workflow for all TMP experiments.
+>
+> This workflow exists to keep experiments reproducible and reduce repeated prompting.
 
 ---
 
-# Before Running an Experiment
+# Standard Workflow
 
-Before starting, clearly define:
+```
+Question
 
-* Research question
-* Hypothesis
-* Configuration
-* Dataset
-* Evaluation metrics
-* Expected outcome
+↓
 
-The objective should be specific enough that the experiment can determine whether the hypothesis is supported.
+Hypothesis
+
+↓
+
+Implementation
+
+↓
+
+Run Experiment
+
+↓
+
+Collect Metrics
+
+↓
+
+Analyze Results
+
+↓
+
+Update Documentation
+
+↓
+
+Next Experiment
+```
 
 ---
 
-# During the Experiment
+# Before Running
 
-Record:
+Verify:
 
-* Configuration used
-* Runtime information
+* Objective is clearly defined.
+* Configuration is saved.
+* Baseline is known.
+* Expected outcome is documented.
+
+---
+
+# During Execution
+
+Save:
+
 * Training logs
+* Configuration
+* Metrics
 * Important warnings
-* Metrics
-* Relevant plots
+* Generated figures (if useful)
 
-Large temporary files do not need to be preserved.
-
----
-
-# After the Experiment
-
-Every completed experiment should produce:
-
-* Final metrics
-* Relevant figures
-* Training logs
-* Configuration used
-* Brief written conclusion
-
-Then update:
-
-* `EXPERIMENT_LOG.md`
-* `RESEARCH_JOURNAL.md` (only if a new insight was obtained)
-* `PROJECT_STATUS.md` (only if the research direction changed)
-* `OPEN_QUESTIONS.md` (if a question was answered or a new one emerged)
+Do not save unnecessary temporary files.
 
 ---
 
-# Experiment Records
+# After Completion
 
-Each experiment should include:
+Always update:
 
-* Experiment ID
-* Objective
-* Hypothesis
+* EXPERIMENT_LOG.md
+
+Update only if necessary:
+
+* CURRENT_CONTEXT.md
+* PROJECT_STATUS.md
+* OPEN_QUESTIONS.md
+
+---
+
+# Required Outputs
+
+Every important experiment should preserve:
+
 * Configuration
 * Metrics
-* Results
-* Interpretation
-* Next action
+* Logs
+* Final results
 
-The experiment itself is the unit of organization.
-
----
-
-# Evidence Policy
-
-Research conclusions should only be made when supported by experimental evidence.
-
-Ideas without evidence remain hypotheses.
-
-Negative results are valuable and should be documented rather than discarded.
+If a figure significantly improves understanding, save it.
 
 ---
 
-# Repository Policy
+# Temporary Outputs
+
+Do NOT commit:
+
+* Cache
+* Temporary checkpoints
+* Intermediate tensors
+* Temporary plots
+* Debug files
+
+---
+
+# Git Policy
 
 Commit:
 
 * Source code
 * Documentation
 * Configurations
-* Small summary metrics
+* Final metrics
 * Important figures
 
-Do not commit:
-
-* Large temporary outputs
-* Cache files
-* Intermediate checkpoints unless necessary
-* Generated files that can easily be reproduced
+Avoid committing generated files that can be recreated.
 
 ---
 
-# Continuous Improvement
+# Goal
 
-This workflow may evolve as the project matures, but every modification should improve consistency, traceability, and scientific rigor.
+Every experiment should be reproducible with minimal additional explanation.
+
+Claude should be able to determine:
+
+* what changed,
+* why it changed,
+* and what happened.

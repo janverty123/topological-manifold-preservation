@@ -1,53 +1,115 @@
 # OPEN QUESTIONS
 
-This document tracks unresolved research problems.
-
-Questions should remain here until they are answered, rejected, or replaced.
+> **Purpose**
+>
+> This document tracks unresolved implementation and research questions.
+>
+> Questions should remain here until they are answered, rejected, or become irrelevant.
+>
+> Do not remove completed questions. Move them to the appropriate section.
 
 ---
 
 # Active Questions
 
-## Q1
+---
 
-Why does learning collapse when TMP is enabled?
+## Q-001
 
-Status: Active
+**Question**
+
+Why does the current TMP implementation underperform compared to expectations?
+
+**Priority**
+
+High
+
+**Status**
+
+Active
 
 ---
 
-## Q2
+## Q-002
 
-Does the surrogate loss dominate CrossEntropy optimization?
+**Question**
 
-Status: Active
+Which implementation changes provide measurable improvements without changing the fundamental TMP framework?
+
+**Priority**
+
+High
+
+**Status**
+
+Active
 
 ---
 
-## Q3
+## Q-003
 
-Do surrogate and CrossEntropy gradients conflict?
+**Question**
 
-Status: Active
+Which hyperparameters have the greatest influence on TMP performance?
+
+**Priority**
+
+Medium
+
+**Status**
+
+Active
 
 ---
 
-## Q4
+## Q-004
 
-Does bottleneck distance remain informative throughout continual learning?
+**Question**
 
-Status: Active
+Which implementation components contribute most to catastrophic forgetting?
+
+**Priority**
+
+Medium
+
+**Status**
+
+Active
+
+---
+
+# Waiting for Experiments
+
+Move questions here when an experiment has been designed but the results are still pending.
 
 ---
 
 # Resolved Questions
 
-Move answered questions here instead of deleting them.
+Move completed questions here.
+
+Do not delete them.
+
+Instead include:
+
+* Experiment ID
+* Resolution
+* Date
+
+This prevents revisiting previously answered questions.
 
 ---
 
-# Rejected Hypotheses
+# Rejected Questions
 
-Document ideas that experiments disproved.
+Move disproven ideas here.
 
-Rejected ideas should remain part of the research history.
+Rejected ideas remain valuable because they prevent repeating unsuccessful approaches.
+
+---
+
+# Related Documents
+
+* CURRENT_CONTEXT.md
+* PROJECT_STATUS.md
+* EXPERIMENT_LOG.md

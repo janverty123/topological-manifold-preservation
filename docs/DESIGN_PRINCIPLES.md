@@ -1,55 +1,93 @@
 # DESIGN PRINCIPLES
 
-This document defines the principles that guide every architectural and research decision.
-
-These principles change rarely.
-
----
-
-# Scientific Principles
-
-* Preserve the topological foundation of TMP.
-* Prefer mathematically justified methods over empirical shortcuts.
-* Evidence always outweighs intuition.
+> **Purpose**
+>
+> This document defines the principles that should remain stable throughout the project.
+>
+> These are not temporary implementation choices.
+>
+> They are the rules that guide future decisions.
 
 ---
 
-# Engineering Principles
+# Development Principles
 
-* Prefer simple explanations before introducing additional complexity.
-* Keep implementations modular and interpretable.
-* Avoid unnecessary algorithmic changes without experimental evidence.
+Claude should preserve the existing project direction unless the user explicitly requests a redesign.
 
----
+Incremental improvements are preferred over large architectural changes.
 
-# Research Principles
-
-* Every major modification should answer a specific research question.
-* Every conclusion should be supported by experiments.
-* Failed experiments are valuable knowledge and should be documented.
+Recommendations should be supported by reasoning before implementation.
 
 ---
 
-# Evaluation Principles
+# Repository Principles
 
-Success is not determined solely by benchmark accuracy.
+The repository should remain:
 
-Evaluation should consider:
+* organized
+* modular
+* reproducible
+* easy to understand
 
-* continual learning performance,
-* topological preservation,
-* stability,
-* interpretability,
-* computational efficiency where appropriate.
+Documentation should reduce repeated prompting rather than increase it.
 
 ---
 
-# AI Collaboration Principles
+# Implementation Principles
 
-AI assistants should:
+Prefer:
 
-* preserve research history,
-* avoid speculative redesigns,
-* explain reasoning,
-* ask questions when evidence is incomplete,
-* recommend experiments before recommending major algorithmic changes.
+* reusable modules
+* readable code
+* consistent naming
+* documented functions
+
+Avoid:
+
+* unnecessary complexity
+* duplicated logic
+* speculative optimization
+* premature abstraction
+
+---
+
+# Experiment Principles
+
+Every meaningful experiment should:
+
+* have a clear objective
+* produce reproducible results
+* be documented
+* support a specific implementation decision
+
+Negative results should be documented rather than discarded.
+
+---
+
+# Claude Collaboration Principles
+
+Claude should:
+
+* understand existing code before suggesting changes
+* avoid repeating previous suggestions
+* use repository documentation as context
+* recommend the smallest effective change first
+* explain trade-offs when multiple solutions exist
+
+---
+
+# Documentation Principles
+
+Documentation exists to answer questions quickly.
+
+Each document has a single responsibility.
+
+Avoid duplicating information across multiple files.
+
+Temporary information belongs in:
+
+* CURRENT_CONTEXT.md
+
+Long-term information belongs in:
+
+* PROJECT_STATUS.md

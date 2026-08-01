@@ -91,3 +91,88 @@ Only then should source files be inspected.
 This repository is under active development.
 
 Documentation is optimized for rapid AI-assisted iteration rather than publication.
+
+# KNOWN CONTEXT
+
+> This file exists to eliminate repeated prompting.
+>
+> Claude should read this before proposing solutions.
+
+---
+
+# Project
+
+Topological Manifold Preservation (TMP)
+
+---
+
+# Current Goal
+
+Improve TMP until it performs competitively with EWC.
+
+---
+
+# Success Criteria
+
+* Better than EWC
+* Equal to EWC
+* Slightly lower than EWC if justified by theoretical advantages
+
+---
+
+# Fixed Decisions
+
+Do not repeatedly suggest changing these:
+
+* Bottleneck Distance remains the topological metric.
+* Continual Learning remains the problem domain.
+* EWC is the primary comparison.
+* Finetune is the secondary comparison.
+
+---
+
+# Already Investigated
+
+Maintain this list.
+
+Example:
+
+* Gradient normalization
+* Surrogate weighting
+* Loss scaling
+
+---
+
+# Do Not Repeat
+
+Add ideas here after they have been discussed extensively.
+
+Example:
+
+* Redesign the entire framework
+* Replace Bottleneck Distance
+* Change the research objective
+
+---
+
+# Current Files of Interest
+
+Update when necessary.
+
+Example:
+
+* src/losses/
+* src/training/
+* configs/
+
+---
+
+# Next Immediate Task
+
+Only one item should appear here.
+
+This is the task Claude should focus on first.
+
+Example:
+
+Investigate why new-task learning degrades despite stable retention.
