@@ -81,3 +81,4 @@ outputs_split_mnist_5task/**/*.ckpt
 !EXPERIMENT_LOG.md
 !OPEN_QUESTIONS.md
 !CLAUDE_PROJECT.md
+!EXPERIMENT_WORKFLOW.md
