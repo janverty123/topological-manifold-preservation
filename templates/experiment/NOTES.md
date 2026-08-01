@@ -12,14 +12,30 @@ run_multitask.py), not a generic placeholder structure. Specifically:
   `compare_multitask_results.py` read to generate plots and stats.
 - `models/` — saved `.pt` checkpoints (`task1_base_model.pt` /
   `task0_base_model.pt`, plus `{method}_final_model.pt` per method).
-  Called `checkpoints/` in some generic project templates; this
-  codebase calls it `models/` everywhere (code, docs, prior
-  conversation history) -- kept consistent with that rather than
-  renamed, to avoid contradicting the implementation.
+  This codebase calls this folder `models/` everywhere (code, docs,
+  every real experiment under `outputs/experiments/`) -- kept
+  consistent with that rather than the more generic `checkpoints/`
+  naming some project templates use.
+
+  **2026-08-02 sync note:** this template previously ALSO shipped an
+  unused `checkpoints/.gitkeep`, left over from before the `models/`
+  naming was settled on. No code has ever written to `checkpoints/`,
+  and no real experiment (`EXP-001`, `EXP-002`) has one. It has been
+  removed from this template during a documentation/organization sync
+  pass. If a future session is tempted to re-add a `checkpoints/`
+  folder "for consistency with some other convention," don't --
+  `models/` is the established, code-verified name across this whole
+  repository; re-adding `checkpoints/` would just reintroduce the
+  same dead folder.
 - `diagrams/` — EXP-001 (2-task) ONLY: saved persistence-diagram
   artifacts (`base_point_cloud.npy`, `diagram_base.npy`) from the TMP
   method's `run_tmp.py`. EXP-002 (multi-task) does not currently save
-  these separately.
+  these separately. This template intentionally does NOT include a
+  `diagrams/.gitkeep` by default for the same reason -- whether a new
+  experiment needs it depends on which pipeline (2-task-style vs.
+  multi-task-style) it follows. Add `diagrams/` manually if your new
+  experiment's TMP method saves persistence diagrams the way EXP-001's
+  does.
 - `plots/` — `.png` outputs from `compare_results.py` /
   `compare_multitask_results.py`.
 

@@ -5,7 +5,7 @@ for "where things stand right now." Update it whenever the current
 objective, priority, or known-issue list changes -- it should never go
 stale for more than one work session.
 
-Last updated: 2026-08-01 (end of EXP-002 bug-fixing round 3)
+Last updated: 2026-08-02 (documentation/repository synchronization pass)
 
 ---
 
@@ -42,6 +42,9 @@ and determine whether:
 4. Only after EXP-002 is validated: consider whether Permuted MNIST /
    Split-CIFAR-100 are worth reviving (currently explicitly
    out-of-scope -- see "Fixed project decisions").
+5. **(Documentation, non-blocking)** Resolve the EXP-001 config
+   discrepancy noted below -- requires a decision from the project
+   owner, not further investigation. See "Current known issues."
 
 ## Fixed project decisions (do not re-litigate without new evidence)
 
@@ -75,6 +78,19 @@ items right now:
 - The `apply_every_n_steps` fix for cumulative-dosage asymmetry is a
   blunt, uniform mitigation, not a structural fix -- it may not fully
   resolve task-specific collapse (see EXPERIMENT_LOG.md EXP-002-07).
+- **NEW (found during 2026-08-02 doc sync, unresolved, needs project-owner decision):**
+  `configs/baseline/split_mnist_2task.yaml` (the EXP-001 config) still
+  holds the PRE-VALIDATION starting values `tmp.lambda_=0.5` /
+  `ewc.lambda_=400.0`, not the validated `5.0` / `20000.0` reported in
+  `outputs/experiments/EXP-001/metadata.yaml` and
+  `outputs/experiments/EXP-001/README.md`. `EXP-001/README.md`'s "How
+  to reproduce" section currently does not actually reproduce the
+  validated numbers if followed literally against the checked-in
+  config. This is a documentation/config inconsistency, not a code
+  bug -- see the `SYNC-FLAG` comment block directly above `tmp:` and
+  `ewc:` in that config file for the two possible resolutions. Not
+  resolved automatically; treat as a research-parameter decision
+  requiring explicit sign-off, per DESIGN_PRINCIPLES.md #8.
 
 ## Immediate next task
 
@@ -87,3 +103,7 @@ python compare_multitask_results.py --log-dir outputs/experiments/EXP-002/logs -
 Then compare the new `mt_comparison_results.json` against the
 provisional numbers in `outputs/experiments/EXP-002/metadata.yaml`,
 and log the outcome as a new entry in `EXPERIMENT_LOG.md` (EXP-002-08).
+
+(Separately, and non-blocking: get a decision on the EXP-001 config
+discrepancy above and resolve it in its own small documentation/config
+commit -- it does not affect EXP-002 work.)
