@@ -5,7 +5,7 @@ Runs the Elastic Weight Consolidation (EWC) baseline referenced in the
 Simulation section's comparative analysis.
 
 Usage:
-    python scripts/run_ewc.py --config configs/config.yaml
+    python scripts/run_ewc.py --config configs/baseline/split_mnist_2task.yaml
 """
 
 import argparse
@@ -19,7 +19,7 @@ from src.train import train_task2, JsonlLogger
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/config.yaml")
+    parser.add_argument("--config", default="configs/baseline/split_mnist_2task.yaml")
     args = parser.parse_args()
 
     cfg, device, loaders, base_model = bootstrap(args.config)

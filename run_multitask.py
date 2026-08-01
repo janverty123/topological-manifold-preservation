@@ -5,9 +5,9 @@ Runs N-task sequential continual learning (5-task Split-MNIST) under
 Finetune, EWC, or TMP.
 
 Usage:
-    python run_multitask.py --config configs/config_split_mnist_5task.yaml --method finetune
-    python run_multitask.py --config configs/config_split_mnist_5task.yaml --method ewc
-    python run_multitask.py --config configs/config_split_mnist_5task.yaml --method tmp
+    python run_multitask.py --config configs/baseline/split_mnist_5task.yaml --method finetune
+    python run_multitask.py --config configs/baseline/split_mnist_5task.yaml --method ewc
+    python run_multitask.py --config configs/baseline/split_mnist_5task.yaml --method tmp
 """
 
 import argparse

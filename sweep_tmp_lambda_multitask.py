@@ -9,8 +9,8 @@ ablation), reusing the SAME cached Task-0 baseline model for every run
 so lambda is the only thing that varies.
 
 Usage:
-    python sweep_tmp_lambda_multitask.py --config configs/config_split_mnist_5task.yaml
-    python sweep_tmp_lambda_multitask.py --config configs/config_split_mnist_5task.yaml \
+    python sweep_tmp_lambda_multitask.py --config configs/baseline/split_mnist_5task.yaml
+    python sweep_tmp_lambda_multitask.py --config configs/baseline/split_mnist_5task.yaml \
         --lambdas 0.0,2.5,5.0,7.5,10.0,15.0
 """
 

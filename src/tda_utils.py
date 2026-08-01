@@ -22,8 +22,8 @@ therefore used for:
 The differentiable *surrogate* term used inside the training loss is
 implemented separately in `losses.py` and is explicitly documented
 there as an implementation choice necessitated by this non-
-differentiability (see README.md, "Implementation Note on
-Differentiability").
+differentiability (see losses.py's module docstring, and
+docs/CODEBASE_GUIDE.md's "Where the TMP loss is implemented" section).
 """
 
 import numpy as np

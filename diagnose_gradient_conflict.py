@@ -24,7 +24,7 @@ Interpretation:
                                    isn't actually the bottleneck)
 
 Usage:
-    python diagnose_gradient_conflict.py --config configs/config_split_mnist_5task.yaml \
+    python diagnose_gradient_conflict.py --config configs/baseline/split_mnist_5task.yaml \
         --task-idx 2
 """
 

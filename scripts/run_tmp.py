@@ -7,7 +7,7 @@ TMP loss (Mathematical Formulation, Section II) while monitoring the
 true Bottleneck Distance W_inf(D_base, D_current) every epoch.
 
 Usage:
-    python scripts/run_tmp.py --config configs/config.yaml
+    python scripts/run_tmp.py --config configs/baseline/split_mnist_2task.yaml
 """
 
 import argparse
@@ -23,7 +23,7 @@ from src.train import train_task2, JsonlLogger, build_baseline_artifacts
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/config.yaml")
+    parser.add_argument("--config", default="configs/baseline/split_mnist_2task.yaml")
     args = parser.parse_args()
 
     cfg, device, loaders, base_model = bootstrap(args.config)

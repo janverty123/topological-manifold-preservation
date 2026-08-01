@@ -1,178 +1,89 @@
-# Topological Manifold Preservation (TMP)
+# Current Context
 
-> **AI-Assisted Research Repository**
+**Read this file first, every time.** It is the single source of truth
+for "where things stand right now." Update it whenever the current
+objective, priority, or known-issue list changes -- it should never go
+stale for more than one work session.
 
-This repository contains the implementation, experiments, and documentation for **Topological Manifold Preservation (TMP)**, a continual learning framework designed to mitigate catastrophic forgetting using topological constraints derived from Bottleneck Distance.
-
-The repository is primarily optimized for **AI-assisted development**, specifically Claude Projects, to minimize repeated prompting and maintain consistent project context.
-
----
-
-# Repository Purpose
-
-The purpose of this repository is to:
-
-* Develop and evaluate the TMP framework.
-* Compare TMP against Finetune and Elastic Weight Consolidation (EWC).
-* Maintain reproducible experiments.
-* Provide Claude with enough context to continue development with minimal user prompting.
+Last updated: 2026-08-01 (end of EXP-002 bug-fixing round 3)
 
 ---
 
-# Current Goal
+## Current objective
 
-The project is currently focused on improving the existing TMP implementation until it performs competitively with EWC.
+Get EXP-002 (5-task Split-MNIST) to a genuinely validated state --
+same bar EXP-001 already cleared -- by confirming TMP's improvement
+over Finetune/EWC holds up AFTER the three bugs found and fixed during
+lambda-sweep testing (see "Fixed project decisions" below).
 
-Success is defined as:
+## Current implementation goal
 
-* outperforming EWC,
-* matching EWC,
-* or achieving performance close enough that TMP's theoretical advantages justify its use.
+Re-run the full 3-method comparison
+(`run_multitask.py --method finetune/ewc/tmp`, then
+`compare_multitask_results.py`) with all three EXP-002 fixes active,
+and determine whether:
+1. Learning accuracy is no longer stuck at 0.0000 for any task.
+2. The class-0 prediction collapse (diagnosed via
+   `analyze_output_layer_bias`) is gone or substantially reduced.
+3. The previously-validated 75.3% / 64.4% / 60.2% retention numbers
+   (TMP / EWC / Finetune) still hold, improve, or need lambda re-tuning.
 
----
+## Current priorities (in order)
 
-# Repository Structure
+1. Re-run EXP-002's full comparison with the current code (all 3 fixes
+   active) -- this is the single next action, see "Immediate next
+   task" below.
+2. If still broken: use `diagnose_gradient_conflict.py` on whichever
+   task is still stuck, to distinguish direct gradient opposition from
+   magnitude dominance (two different fixes).
+3. If working: re-validate `tmp.lambda_` / `ewc.lambda_` specifically
+   for 5-task via the sweep scripts (currently inherited, unconfirmed
+   starting points from EXP-001).
+4. Only after EXP-002 is validated: consider whether Permuted MNIST /
+   Split-CIFAR-100 are worth reviving (currently explicitly
+   out-of-scope -- see "Fixed project decisions").
 
-```text
-configs/        Experiment configurations
+## Fixed project decisions (do not re-litigate without new evidence)
 
-docs/           Project documentation
+- **Scope is Split-MNIST only** (2-task EXP-001 + 5-task EXP-002).
+  Permuted MNIST and Split-CIFAR-100 were explicitly descoped by the
+  research team to stay within the approved research plan and to
+  finish debugging one dataset properly before adding more. Code for
+  CIFAR-100 (`CNNClassifier`, `build_split_cifar100_tasks`) was
+  REMOVED from this repo copy, not just unused -- don't assume it
+  exists.
+- **`retention_accuracy` means class-incremental (unmasked, full
+  10-way head)**, not task-incremental (masked). This was a real bug
+  fixed early in EXP-001 -- the masked metric substantially understates
+  forgetting and made all three methods look artificially similar.
+- **The 2-task and multi-task pipelines are separate code**, not a
+  shared abstraction (see DESIGN_PRINCIPLES.md). Do not refactor them
+  together without strong justification.
+- **TMP's differentiable surrogate compares a FIXED reference image
+  set against itself over time**, never two different random samples.
+  An earlier version compared different images and produced a
+  meaningless, noisy training signal -- this was a real, diagnosed bug.
 
-scripts/        Training / evaluation entry points
+## Current known issues
 
-src/            Source code
+See OPEN_QUESTIONS.md for the full, actively-tracked list. Headline
+items right now:
+- EXP-002's validated-looking 75.3/64.4/60.2 retention numbers predate
+  three bugfixes and have NOT been re-confirmed.
+- `tmp.lambda_=5.0` and `ewc.lambda_=20000.0` in the 5-task config are
+  inherited from EXP-001, not independently re-validated for 5 tasks.
+- The `apply_every_n_steps` fix for cumulative-dosage asymmetry is a
+  blunt, uniform mitigation, not a structural fix -- it may not fully
+  resolve task-specific collapse (see EXPERIMENT_LOG.md EXP-002-07).
 
-tests/          Testing
+## Immediate next task
 
-outputs/        Generated experiment outputs
+```bash
+python run_multitask.py --config configs/baseline/split_mnist_5task.yaml --method finetune
+python run_multitask.py --config configs/baseline/split_mnist_5task.yaml --method ewc
+python run_multitask.py --config configs/baseline/split_mnist_5task.yaml --method tmp
+python compare_multitask_results.py --log-dir outputs/experiments/EXP-002/logs --plot-dir outputs/experiments/EXP-002/plots
 ```
-
----
-
-# Documentation
-
-| File                   | Purpose                                    |
-| ---------------------- | ------------------------------------------ |
-| CURRENT_CONTEXT.md     | Current project state for Claude           |
-| CLAUDE_PROJECT.md      | Claude collaboration instructions          |
-| PROJECT_STATUS.md      | Overall implementation progress            |
-| DESIGN_PRINCIPLES.md   | Rules that should not change               |
-| OPEN_QUESTIONS.md      | Current unresolved implementation problems |
-| EXPERIMENT_LOG.md      | History of experiments                     |
-| EXPERIMENT_WORKFLOW.md | Standard experiment workflow               |
-
----
-
-# Development Philosophy
-
-This repository prioritizes:
-
-1. Correct implementation
-2. Reproducibility
-3. Clear documentation
-4. Efficient AI collaboration
-
----
-
-# First Steps for Claude
-
-Before inspecting code, Claude should read:
-
-1. docs/CURRENT_CONTEXT.md
-2. docs/CLAUDE_PROJECT.md
-3. docs/PROJECT_STATUS.md
-
-Only then should source files be inspected.
-
----
-
-# Notes
-
-This repository is under active development.
-
-Documentation is optimized for rapid AI-assisted iteration rather than publication.
-
-# KNOWN CONTEXT
-
-> This file exists to eliminate repeated prompting.
->
-> Claude should read this before proposing solutions.
-
----
-
-# Project
-
-Topological Manifold Preservation (TMP)
-
----
-
-# Current Goal
-
-Improve TMP until it performs competitively with EWC.
-
----
-
-# Success Criteria
-
-* Better than EWC
-* Equal to EWC
-* Slightly lower than EWC if justified by theoretical advantages
-
----
-
-# Fixed Decisions
-
-Do not repeatedly suggest changing these:
-
-* Bottleneck Distance remains the topological metric.
-* Continual Learning remains the problem domain.
-* EWC is the primary comparison.
-* Finetune is the secondary comparison.
-
----
-
-# Already Investigated
-
-Maintain this list.
-
-Example:
-
-* Gradient normalization
-* Surrogate weighting
-* Loss scaling
-
----
-
-# Do Not Repeat
-
-Add ideas here after they have been discussed extensively.
-
-Example:
-
-* Redesign the entire framework
-* Replace Bottleneck Distance
-* Change the research objective
-
----
-
-# Current Files of Interest
-
-Update when necessary.
-
-Example:
-
-* src/losses/
-* src/training/
-* configs/
-
----
-
-# Next Immediate Task
-
-Only one item should appear here.
-
-This is the task Claude should focus on first.
-
-Example:
-
-Investigate why new-task learning degrades despite stable retention.
+Then compare the new `mt_comparison_results.json` against the
+provisional numbers in `outputs/experiments/EXP-002/metadata.yaml`,
+and log the outcome as a new entry in `EXPERIMENT_LOG.md` (EXP-002-08).

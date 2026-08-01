@@ -17,7 +17,7 @@ run, and for a chosen "victim" task:
      interference.
 
 Usage:
-    python diagnose_task_confusion.py --config configs/config_split_mnist_5task.yaml \
+    python diagnose_task_confusion.py --config configs/baseline/split_mnist_5task.yaml \
         --method tmp --victim-task 1
 """
 

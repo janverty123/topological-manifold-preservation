@@ -7,7 +7,7 @@ comparison/plotting step. Equivalent to running the individual scripts
 one after another.
 
 Usage:
-    python run_all.py --config configs/config.yaml
+    python run_all.py --config configs/baseline/split_mnist_2task.yaml
 """
 
 import argparse
@@ -24,7 +24,7 @@ def run(cmd):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/config.yaml")
+    parser.add_argument("--config", default="configs/baseline/split_mnist_2task.yaml")
     args = parser.parse_args()
 
     py = sys.executable

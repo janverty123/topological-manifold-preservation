@@ -21,7 +21,7 @@ Key differences from the two-task version:
     and as an average across all of them.
 
 Improvements added on top of the initial working version, based on
-diagnosing weak per-task protection (see README_MULTITASK.md):
+diagnosing weak per-task protection (see docs/MULTITASK.md):
   - AdaptiveLambdaScheduler: EMA-smoothed lambda instead of reacting to
     a single noisy epoch's drift measurement.
   - MultiTaskTMPReference.weighted_surrogate_loss: per-task-in-pool

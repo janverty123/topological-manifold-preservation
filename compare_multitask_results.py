@@ -10,7 +10,7 @@ present in the log directory -- works with just 2 of the 3 methods if
 that's all you've run so far.
 
 Usage:
-    python compare_multitask_results.py --log-dir outputs_split_mnist_5task/logs --plot-dir outputs_split_mnist_5task/plots
+    python compare_multitask_results.py --log-dir outputs/experiments/EXP-002/logs --plot-dir outputs/experiments/EXP-002/plots
 """
 
 import argparse

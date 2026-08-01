@@ -8,7 +8,7 @@ Run this AFTER scripts/run_finetune.py, scripts/run_ewc.py, and
 scripts/run_tmp.py have all completed.
 
 Usage:
-    python compare_results.py --config configs/config.yaml
+    python compare_results.py --config configs/baseline/split_mnist_2task.yaml
 """
 
 import argparse
@@ -22,7 +22,7 @@ from src.visualize import generate_all_plots
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/config.yaml")
+    parser.add_argument("--config", default="configs/baseline/split_mnist_2task.yaml")
     args = parser.parse_args()
 
     with open(args.config) as f:

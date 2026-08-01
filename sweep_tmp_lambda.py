@@ -17,8 +17,8 @@ thing that varies is lambda. This directly tests:
      forward passes injected into the training loop.
 
 Usage:
-    python sweep_tmp_lambda.py --config configs/config.yaml
-    python sweep_tmp_lambda.py --config configs/config.yaml --lambdas 0.0,0.5,1.0,2.0,5.0,10.0
+    python sweep_tmp_lambda.py --config configs/baseline/split_mnist_2task.yaml
+    python sweep_tmp_lambda.py --config configs/baseline/split_mnist_2task.yaml --lambdas 0.0,0.5,1.0,2.0,5.0,10.0
 """
 
 import argparse
@@ -42,7 +42,7 @@ def resolve_device(cfg):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/config.yaml")
+    parser.add_argument("--config", default="configs/baseline/split_mnist_2task.yaml")
     parser.add_argument("--lambdas", default="0.0,0.5,1.0,2.0,5.0,10.0",
                          help="Comma-separated list of tmp.lambda_ values to sweep.")
     args = parser.parse_args()

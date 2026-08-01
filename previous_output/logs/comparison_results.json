@@ -1,0 +1,45 @@
+{
+  "summary": {
+    "ewc": {
+      "retention_accuracy_mean": 0.8099630278264254,
+      "retention_accuracy_std": 0.06898010115403219,
+      "learning_accuracy_mean": 0.9743674141123225,
+      "learning_accuracy_std": 0.007339040709741181,
+      "epoch_time_sec_mean": 8.70698869228363,
+      "epoch_time_sec_std": 0.23618727642406134,
+      "memory_mb_mean": 1113.37265625,
+      "memory_mb_std": 5.126436258668625
+    },
+    "finetune": {
+      "retention_accuracy_mean": 0.3733994940649932,
+      "retention_accuracy_std": 0.1379615029669761,
+      "learning_accuracy_mean": 0.9821230199547418,
+      "learning_accuracy_std": 0.005136524790467546,
+      "epoch_time_sec_mean": 8.568894815444946,
+      "epoch_time_sec_std": 0.26756536767177674,
+      "memory_mb_mean": 961.726953125,
+      "memory_mb_std": 13.523621596982137
+    },
+    "tmp": {
+      "retention_accuracy_mean": 0.9241486670558474,
+      "retention_accuracy_std": 0.007374379501548892,
+      "learning_accuracy_mean": 0.9829664678049784,
+      "learning_accuracy_std": 0.004494330862694625,
+      "epoch_time_sec_mean": 9.346410083770753,
+      "epoch_time_sec_std": 1.491357677853163,
+      "memory_mb_mean": 871.076953125,
+      "memory_mb_std": 253.57399279035133
+    }
+  },
+  "retention_vs_finetune": {
+    "statistic": 0.0,
+    "p_value": 0.001953125,
+    "verdict": "Reject H0 (p=0.0020 < 0.05): significant difference in retention_accuracy between tmp and finetune."
+  },
+  "retention_vs_ewc": {
+    "statistic": 0.0,
+    "p_value": 0.001953125,
+    "verdict": "Reject H0 (p=0.0020 < 0.05): significant difference in retention_accuracy between tmp and ewc."
+  },
+  "drift_vs_finetune_note": "Feature Space Drift (W_inf) is only computed for the 'tmp' method in this reference implementation; extend train.py to compute it for finetune/ewc as well if a drift comparison is required for Research Question 2."
+}

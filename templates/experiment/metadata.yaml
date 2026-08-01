@@ -1,0 +1,28 @@
+# Template: copy to outputs/experiments/EXP-XXX/metadata.yaml and fill in
+# after running a new experiment. Not read by any script -- documentation only.
+
+experiment:
+  id: EXP-XXX
+  name: <short_snake_case_name>
+  parent_config: configs/baseline/<config_file_used>.yaml
+  version: 1
+  status: draft   # draft | active_debugging | validated | archived
+  created: <YYYY-MM-DD>
+  author: <who ran this>
+
+objective: >
+  <One or two sentences: what question is this experiment trying to answer?>
+
+methods_run:
+  - finetune   # remove any not actually run
+  - ewc
+  - tmp
+
+key_hyperparameters:
+  tmp_lambda: <value>
+  ewc_lambda: <value>
+  num_tasks: <value>
+
+related:
+  experiment_log_entry: EXPERIMENT_LOG.md#EXP-XXX
+  open_questions: OPEN_QUESTIONS.md   # link specific question IDs if applicable

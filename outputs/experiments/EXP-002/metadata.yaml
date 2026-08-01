@@ -1,0 +1,43 @@
+experiment:
+  id: EXP-002
+  name: split_mnist_5task_stress_test
+  parent_config: configs/baseline/split_mnist_5task.yaml
+  version: 3   # v1: initial multi-task pipeline; v2: gradient-explosion fix; v3: weight-cap + cumulative-dosage fixes
+  status: active_debugging
+  created: 2026-07-28
+  author: Mike Sales (research team), implementation by Claude
+
+objective: >
+  Test whether TMP's protection holds up over a LONGER sequence of
+  SMALLER tasks within the same dataset (Split-MNIST split into 5
+  tasks of 2 digits each, instead of 2 tasks of 5 digits each) -- a
+  more direct stress test of whether protection decays as more tasks
+  accumulate. Explicitly deferred: Permuted MNIST and Split-CIFAR-100
+  (out of scope for the approved research plan; code for both still
+  exists but is not the current priority -- see OPEN_QUESTIONS.md).
+
+methods_run:
+  - finetune
+  - ewc
+  - tmp
+
+key_hyperparameters:
+  tmp_lambda: 5.0       # NOT yet re-validated for 5-task via sweep_tmp_lambda_multitask.py -- see OPEN_QUESTIONS.md
+  ewc_lambda: 20000.0    # inherited starting point from EXP-001, not yet re-validated for 5-task
+  num_tasks: 5
+  apply_every_n_steps: 2  # added in v3 fix -- see EXPERIMENT_LOG.md EXP-002-06
+
+related:
+  experiment_log_entry: EXPERIMENT_LOG.md#EXP-002
+  open_questions: OPEN_QUESTIONS.md
+
+result_summary: >
+  ONE full 3-method comparison completed and statistically validated:
+  TMP retention 75.3% > EWC 64.4% > Finetune 60.2% (Wilcoxon p<0.0001
+  TMP vs Finetune, p=0.0001 TMP vs EWC, learning-speed difference vs
+  EWC not significant at p=0.755). HOWEVER this run predates three bugs
+  found afterward during lambda-sweep testing (gradient explosion, weight
+  concentration, cumulative dosage asymmetry -- see EXPERIMENT_LOG.md).
+  Whether the validated 75.3/64.4/60.2 numbers still hold after all
+  three fixes has NOT yet been re-confirmed. Treat as active_debugging,
+  not validated, until re-run.

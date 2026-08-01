@@ -1,0 +1,23 @@
+{
+  "_comment": "Template -- copy to outputs/experiments/EXP-XXX/metrics.json and fill in after running. This is a MANUALLY-curated summary; the authoritative raw data is always the per-method .jsonl files in this experiment's logs/ folder.",
+  "experiment_id": "EXP-XXX",
+  "generated_from_logs": ["logs/finetune.jsonl", "logs/ewc.jsonl", "logs/tmp.jsonl"],
+  "summary": {
+    "finetune": {
+      "final_retention_accuracy": null,
+      "final_learning_accuracy": null
+    },
+    "ewc": {
+      "final_retention_accuracy": null,
+      "final_learning_accuracy": null
+    },
+    "tmp": {
+      "final_retention_accuracy": null,
+      "final_learning_accuracy": null
+    }
+  },
+  "significance_tests": {
+    "tmp_vs_ewc_retention_pvalue": null,
+    "tmp_vs_finetune_retention_pvalue": null
+  }
+}

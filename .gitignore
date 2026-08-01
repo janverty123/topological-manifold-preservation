@@ -1,84 +1,23 @@
-# =====================================================
-# Python
-# =====================================================
-__pycache__/
-*.py[cod]
-*$py.class
-
-# Virtual environments
 .venv/
-venv/
-env/
+data/*
+!data/.gitkeep
 
-# Jupyter
+# Per-experiment generated artifacts -- keep folder structure, ignore contents
+outputs/experiments/*/models/*
+!outputs/experiments/*/models/.gitkeep
+outputs/experiments/*/logs/*
+!outputs/experiments/*/logs/.gitkeep
+outputs/experiments/*/diagrams/*
+!outputs/experiments/*/diagrams/.gitkeep
+outputs/experiments/*/plots/*
+!outputs/experiments/*/plots/.gitkeep
+
+outputs/archive/*
+!outputs/archive/.gitkeep
+
+configs/archive/*
+!configs/archive/.gitkeep
+
+__pycache__/
+*.pyc
 .ipynb_checkpoints/
-
-# OS files
-.DS_Store
-Thumbs.db
-
-# IDEs
-.vscode/
-.idea/
-
-# =====================================================
-# Dataset (can be regenerated/downloaded)
-# =====================================================
-data/
-
-# =====================================================
-# Model checkpoints (large, generated)
-# =====================================================
-**/*.pt
-**/*.pth
-**/*.ckpt
-
-# =====================================================
-# TensorBoard / Experiment trackers
-# =====================================================
-runs/
-wandb/
-mlruns/
-events.out.tfevents*
-
-# =====================================================
-# Cache
-# =====================================================
-.cache/
-.pytest_cache/
-.mypy_cache/
-
-# =====================================================
-# Generated experiment outputs
-# =====================================================
-
-# Keep logs and figures, ignore heavy generated artifacts
-outputs/models/
-outputs/**/*.pt
-outputs/**/*.pth
-outputs/**/*.ckpt
-
-outputs_split_mnist_5task/models/
-outputs_split_mnist_5task/**/*.pt
-outputs_split_mnist_5task/**/*.pth
-outputs_split_mnist_5task/**/*.ckpt
-
-# =====================================================
-# Temporary files
-# =====================================================
-*.tmp
-*.temp
-*.log~
-
-# =====================================================
-# KEEP THESE (Research Documentation)
-# =====================================================
-!README.md
-!README_MULTITASK.md
-!PROJECT_STATUS.md
-!DESIGN_PRINCIPLES.md
-!RESEARCH_JOURNAL.md
-!EXPERIMENT_LOG.md
-!OPEN_QUESTIONS.md
-!CLAUDE_PROJECT.md
-!EXPERIMENT_WORKFLOW.md

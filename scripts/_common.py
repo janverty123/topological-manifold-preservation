@@ -20,7 +20,7 @@ from src.models import MLPClassifier
 from src.train import set_seed, pretrain_task1, JsonlLogger
 
 
-def load_config(path="configs/config.yaml"):
+def load_config(path="configs/baseline/split_mnist_2task.yaml"):
     with open(path) as f:
         cfg = yaml.safe_load(f)
     return cfg
@@ -32,7 +32,7 @@ def resolve_device(cfg):
     return torch.device("cpu")
 
 
-def bootstrap(cfg_path="configs/config.yaml"):
+def bootstrap(cfg_path="configs/baseline/split_mnist_2task.yaml"):
     """
     Loads config, sets seeds, builds dataloaders, and pretrains (or loads
     a cached) Task-1 model + baseline artifacts. Returns everything the
